@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import Alert from "./components/Alert";
 
 function App() {
   const [jwtToken, setJwtToken] = useState<string>("");
+  const [alertMessage, setAlertMessage] = useState<string>("");
+  const [alertClassName, setAlertClassName] = useState<string>("d-none");
   return (
     <div className="container">
       <div className="row">
@@ -67,7 +70,15 @@ function App() {
           </nav>
         </div>
         <div className="col-md-10">
-          <Outlet />
+          <Alert message={alertMessage} className={alertClassName} />
+          <Outlet
+            context={{
+              jwtToken: jwtToken,
+              setJwtToken: setJwtToken,
+              setAlertClassName,
+              setAlertMessage,
+            }}
+          />
         </div>
       </div>
     </div>
