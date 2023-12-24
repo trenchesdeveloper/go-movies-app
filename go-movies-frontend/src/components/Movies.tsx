@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-interface Movie {
+export interface Movie {
     id: number;
     title: string;
     release_date: string;
