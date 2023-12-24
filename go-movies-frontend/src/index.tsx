@@ -10,12 +10,14 @@ import EditMovie from "./components/EditMovie";
 import Graphql from "./components/Graphql";
 import Login from "./components/Login";
 import ManageCatalogue from "./components/ManageCatalogue";
+import Movie from "./components/Movie";
 
 const router = createBrowserRouter([{ path: "/", element: <App />,
   errorElement: <ErrorPage/>,
   children:[
     {index:true, element: <Home />},
     {path: "/movies", element: <Movies />},
+    {path: "/movies/:id", element: <Movie />},
     {path: "/genres", element: <Genres />},
     {path: "/admin/movie/0", element: <EditMovie />},
     {path: "/manage-catalogue", element: <ManageCatalogue />},
