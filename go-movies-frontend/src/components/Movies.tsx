@@ -14,11 +14,17 @@ function Movies() {
     const [movies, setMovies] = useState<Movie[]>([]);
 
     useEffect(() => {
-        let moviesList: Movie[] = [
-            { id: 1, title: "The Shawshank Redemption", release_date: '1986-03-07', runtime: 116, mpaa_rating: 'R', description: 'Arandom description' },
-            { id: 2, title: "The Godfather", release_date: '1981-06-12', runtime: 116, mpaa_rating: 'R', description: 'Arandom description' },
-        ];
-        setMovies(moviesList);
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        headers.append("Accept", "application/json");
+       const requestOptions = {
+            method: "GET",
+            headers: headers,
+        };
+        fetch("http://localhost:8080/movies", requestOptions)
+            .then((response) => response.json())
+            .then((data) => setMovies(data))
+            .catch((error) => console.log(error));
     }, []);
 
     return (

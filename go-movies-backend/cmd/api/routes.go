@@ -11,7 +11,9 @@ func (app *application) routes() *chi.Mux {
 	mux.Use(middleware.Logger)
 	mux.Use(middleware.Recoverer)
 
+	mux.Get("/", app.Hello)
 
+	mux.Get("/movies", app.AllMovies)
 	return mux
 
 }
