@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -19,11 +18,6 @@ func (app *application) AllMovies(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Marshal the payload to JSON
-	out, _ := json.MarshalIndent(movies, "", "\t")
-
-	// Write the JSON payload to the response
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(out)
+	_ = app.writeJson(w, http.StatusOK, movies)
 
 }
