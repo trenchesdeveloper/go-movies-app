@@ -22,9 +22,11 @@ func main() {
 
 	app.Domain = "example.com"
 
+	router := app.routes()
+
 	log.Println("Starting server on port", port)
 	// start the server
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 
 	if err != nil {
 		log.Fatal(err)
