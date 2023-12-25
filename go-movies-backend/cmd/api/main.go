@@ -1,11 +1,13 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/trenchesdeveloper/go-backend/internal/repository"
+	"github.com/trenchesdeveloper/go-backend/internal/repository/dbrepo"
 )
 
 const port = 8080
@@ -13,7 +15,7 @@ const port = 8080
 type application struct {
 	Domain string
 	DSN    string
-	DB     *sql.DB
+	DB     repository.DatabaseRepo
 }
 
 func main() {
@@ -32,8 +34,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app.DB = conn
-
+	app.DB = &dbrepo.PostgresDBRepo{DB: conn}
+	app.DB.Connection().Close()
 	app.Domain = "example.com"
 
 	router := app.routes()
