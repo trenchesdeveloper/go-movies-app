@@ -21,3 +21,5 @@ func (app *application) AllMovies(w http.ResponseWriter, r *http.Request) {
 	_ = app.writeJson(w, http.StatusOK, movies)
 
 }
+
+
