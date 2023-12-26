@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -77,5 +76,5 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 
 	// send token to user
 	_ = app.writeJson(w, http.StatusAccepted, tokens)
- 
+
 }
