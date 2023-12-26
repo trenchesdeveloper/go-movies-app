@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/trenchesdeveloper/go-backend/internal/repository"
 	"github.com/trenchesdeveloper/go-backend/internal/repository/dbrepo"
@@ -13,9 +14,14 @@ import (
 const port = 8080
 
 type application struct {
-	Domain string
-	DSN    string
-	DB     repository.DatabaseRepo
+	Domain       string
+	DSN          string
+	DB           repository.DatabaseRepo
+	auth         Auth
+	JWTSecret    string
+	JwtIssuer    string
+	JWTAudience  string
+	CookieDomain string
 }
 
 func main() {
@@ -23,9 +29,12 @@ func main() {
 	var app application
 
 	// read from command line
-	flag.StringVar(&app.Domain, "domain", "localhost", "Domain for the application")
+	flag.StringVar(&app.Domain, "domain", "example.com", "Domain for the application")
 	flag.StringVar(&app.DSN, "dsn", "host=localhost port=5432 dbname=movies user=postgres password=postgres sslmode=disable connect_timeout=5", "Postgres connection string")
-
+	flag.StringVar(&app.JWTSecret, "jwt-secret", "secret", "Secret key for JWT")
+	flag.StringVar(&app.JwtIssuer, "jwt-issuer", "example.com", "Issuer for JWT")
+	flag.StringVar(&app.JWTAudience, "jwt-audience", "example.com", "Audience for JWT")
+	flag.StringVar(&app.CookieDomain, "cookie-domain", "localhost", "Domain for the cookie")
 	flag.Parse()
 
 	// connect to database
@@ -35,8 +44,19 @@ func main() {
 	}
 
 	app.DB = &dbrepo.PostgresDBRepo{DB: conn}
-	app.DB.Connection().Close()
-	app.Domain = "example.com"
+	defer app.DB.Connection().Close()
+
+	app.auth = Auth{
+		Issuer:        app.JwtIssuer,
+		Audience:      app.JWTAudience,
+		Secret:        app.JWTSecret,
+		TokenExpiry:   time.Minute * 15,
+		RefreshExpiry: time.Hour * 24,
+		CookieDomain:  app.CookieDomain,
+		CookiePath:    "/",
+		CookieName:    "__Host-refresh-token",
+
+	}
 
 	router := app.routes()
 
