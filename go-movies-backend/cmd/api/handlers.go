@@ -25,6 +25,17 @@ func (app *application) AllMovies(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 	// read a json payload
+	var requestPayload struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	err := app.readJson(w, r, &requestPayload)
+
+	if err != nil {
+		app.errorJson(w, err, http.StatusBadRequest)
+		return
+	}
 
 	// validate user against database
 
