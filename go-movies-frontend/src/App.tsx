@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import Alert from "./components/Alert";
+import { log } from "console";
 
 function App() {
   const [jwtToken, setJwtToken] = useState<string>("");
   const [alertMessage, setAlertMessage] = useState<string>("");
   const [alertClassName, setAlertClassName] = useState<string>("d-none");
+
+  const [ticking, setTicking] = useState<boolean>(false);
+  const [tickInterval, setTickInterval] = useState<NodeJS.Timeout>();
 
   const navigate = useNavigate();
 
@@ -18,7 +22,7 @@ function App() {
     fetch("/logout", requestOptions)
       .catch((error) => console.log("error logging out", error))
       .finally(() => setJwtToken(""));
-      
+
     navigate("/login");
   };
   useEffect(() => {
@@ -39,6 +43,25 @@ function App() {
         .catch((error) => console.log("user not logged in", error));
     }
   }, [jwtToken]);
+
+  const toggleRefresh = () => {
+    console.log("toggling refresh");
+
+    if (!ticking) {
+      console.log("turning on ticking");
+      let i = setInterval(() => {
+        console.log("ticking");
+      }, 1000);
+      setTickInterval(i);
+      setTicking(true);
+      console.log("setting tick interval to ", i);
+    } else {
+      console.log("turning off ticking", tickInterval);
+      setTickInterval(undefined);
+      clearInterval(tickInterval as NodeJS.Timeout);
+      setTicking(false);
+    }
+  };
 
   return (
     <div className="container">
@@ -104,6 +127,13 @@ function App() {
           </nav>
         </div>
         <div className="col-md-10">
+          <a
+            href="#!"
+            className="btn btn-outline-secondary"
+            onClick={toggleRefresh}
+          >
+            Ticking
+          </a>
           <Alert message={alertMessage} className={alertClassName} />
           <Outlet
             context={{
