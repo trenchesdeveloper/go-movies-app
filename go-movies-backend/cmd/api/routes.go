@@ -18,6 +18,8 @@ func (app *application) routes() *chi.Mux {
 
 	mux.Get("/refresh", app.refreshToken)
 
+	mux.Get("/logout", app.logout)
+
 	mux.Get("/movies", app.AllMovies)
 	return mux
 

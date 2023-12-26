@@ -10,7 +10,15 @@ function App() {
   const navigate = useNavigate();
 
   const logOut = () => {
-    setJwtToken("");
+    const requestOptions: RequestInit = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include" as RequestCredentials,
+    };
+    fetch("/logout", requestOptions)
+      .catch((error) => console.log("error logging out", error))
+      .finally(() => setJwtToken(""));
+      
     navigate("/login");
   };
   useEffect(() => {
