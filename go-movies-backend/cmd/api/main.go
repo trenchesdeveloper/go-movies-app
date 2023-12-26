@@ -54,7 +54,7 @@ func main() {
 		RefreshExpiry: time.Hour * 24,
 		CookieDomain:  app.CookieDomain,
 		CookiePath:    "/",
-		CookieName:    "__Host-refresh-token",
+		CookieName:    "refresh-token",
 
 	}
 

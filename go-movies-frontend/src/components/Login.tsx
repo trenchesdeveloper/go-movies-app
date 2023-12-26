@@ -18,16 +18,36 @@ function Login() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (email === "admin@example.com") {
-      console.log("Login successful");
-      setJwtToken("token");
-      setAlertClassName("d-none");
-      setAlertMessage("");
-      navigate("/");
-    } else {
-      setAlertClassName("alert-danger");
-      setAlertMessage("Invalid credentials");
-    }
+    // build the request body
+    const requestBody = {
+      email,
+      password,
+    };
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include" as RequestCredentials,
+      body: JSON.stringify(requestBody),
+    };
+
+    fetch("/authenticate", requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          setAlertClassName("alert alert-danger");
+          setAlertMessage(data.message);
+        } else {
+          setJwtToken(data.access_token);
+          setAlertClassName("d-none");
+          setAlertMessage("");
+          navigate("/");
+        }
+      })
+
+      .catch((error) => {
+        setAlertClassName("alert alert-danger");
+        setAlertMessage("Login Failed");
+      });
   };
   return (
     <div className="col-md-6 offset-md-3">
