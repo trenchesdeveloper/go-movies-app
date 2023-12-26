@@ -47,12 +47,18 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check password
+	valid, err := user.ValidatePassword(requestPayload.Password)
+
+	if !valid || err != nil {
+		app.errorJson(w, errors.New("invalid credentials"), http.StatusBadRequest)
+		return
+	}
 
 	// create a jwt user
 	u := jwtUser{
-		ID:        1,
-		FirstName: "John",
-		LastName:  "Doe",
+		ID:        user.ID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 	}
 
 	//generate token
@@ -63,8 +69,6 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(tokens.Token)
-
 	refreshCookie := app.auth.GetRefreshCookie(
 		tokens.RefreshToken,
 	)
@@ -72,6 +76,6 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, refreshCookie)
 
 	// send token to user
-	_ = app.writeJson(w, http.StatusOK, tokens)
-
+	_ = app.writeJson(w, http.StatusAccepted, tokens)
+ 
 }
