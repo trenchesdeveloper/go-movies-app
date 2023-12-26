@@ -5,6 +5,7 @@ interface ContextType {
   setJwtToken: (token: string) => void;
   setAlertClassName: (className: string) => void;
   setAlertMessage: (message: string) => void;
+  toggleRefresh: (status: boolean) => void;
   // include other properties of the context here
 }
 function Login() {
@@ -13,7 +14,7 @@ function Login() {
 
   const navigate = useNavigate();
 
-  const { setJwtToken, setAlertClassName, setAlertMessage } =
+  const { setJwtToken, setAlertClassName, setAlertMessage, toggleRefresh } =
     useOutletContext<ContextType>();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,6 +41,7 @@ function Login() {
           setJwtToken(data.access_token);
           setAlertClassName("d-none");
           setAlertMessage("");
+          toggleRefresh(true);
           navigate("/");
         }
       })
