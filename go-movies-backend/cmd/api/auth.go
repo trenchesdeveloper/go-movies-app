@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -85,8 +86,8 @@ func (j *Auth) GetRefreshCookie(refreshToken string) *http.Cookie {
 		Domain:   j.CookieDomain,
 		Path:     j.CookiePath,
 		SameSite: http.SameSiteStrictMode,
-		Expires: time.Now().Add(j.RefreshExpiry),
-		MaxAge: int(j.RefreshExpiry.Seconds()),
+		Expires:  time.Now().Add(j.RefreshExpiry),
+		MaxAge:   int(j.RefreshExpiry.Seconds()),
 	}
 	return &cookie
 }
@@ -101,8 +102,65 @@ func (j *Auth) GetExpiredRefreshCookie() *http.Cookie {
 		Domain:   j.CookieDomain,
 		Path:     j.CookiePath,
 		SameSite: http.SameSiteLaxMode,
-		Expires: time.Now().Add(-1 * time.Hour),
-		MaxAge: -1,
+		Expires:  time.Now().Add(-1 * time.Hour),
+		MaxAge:   -1,
 	}
 	return &cookie
+}
+
+func (j *Auth) GetTokenFromHeaderAndVerify(w http.ResponseWriter, r *http.Request) (string, *Claims, error) {
+	w.Header().Add("Vary", "Authorization")
+
+	// get the authorization header
+	authHeader := r.Header.Get("Authorization")
+
+	// check if the authorization header is empty
+	if authHeader == "" {
+		return "", nil, fmt.Errorf("no authorization header provided")
+	}
+
+	// split the authorization header on space
+	headerParts := strings.Split(authHeader, " ")
+
+	// check if the authorization header has two parts
+	if len(headerParts) != 2 {
+		return "", nil, fmt.Errorf("invalid authorization header provided")
+	}
+
+	// check if the authorization header has bearer as the first part
+	if headerParts[0] != "Bearer" {
+		return "", nil, fmt.Errorf("invalid authorization header provided")
+	}
+
+	// get the token from the second part of the authorization header
+	token := headerParts[1]
+
+	// declare empty claims
+	claims := &Claims{}
+
+	// parse the token
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		// check the signing method
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("invalid signing method: %v", token.Header["alg"])
+		}
+		// return the secret key
+		return []byte(j.Secret), nil
+	})
+
+
+	if err != nil {
+		if strings.HasPrefix(err.Error(), "token is expired") {
+			return "", nil, fmt.Errorf("token is expired")
+		}
+		return "", nil, err
+	}
+
+	// check if the token is valid
+	if claims.Issuer != j.Issuer {
+		return "", nil, fmt.Errorf("invalid token issuer")
+	}
+
+	return token, claims, nil
+
 }

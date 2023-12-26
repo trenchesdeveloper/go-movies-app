@@ -21,6 +21,13 @@ func (app *application) routes() *chi.Mux {
 	mux.Get("/logout", app.logout)
 
 	mux.Get("/movies", app.AllMovies)
+
+	mux.Route("/admin", func(r chi.Router) {
+		r.Use(app.authRequired)
+
+		mux.Get("/movies", app.MovieCatalog)
+	})
+
 	return mux
 
 }
