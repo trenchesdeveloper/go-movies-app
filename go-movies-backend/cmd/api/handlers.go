@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -22,4 +23,28 @@ func (app *application) AllMovies(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
+	// read a json payload
 
+	// validate user against database
+
+	// check password
+
+	// create a jwt user
+	u := jwtUser{
+		ID:       1,
+		FirstName: "John",
+		LastName: "Doe",
+	}
+
+	//generate token
+	tokens, err := app.auth.GenerateTokenPair(&u)
+
+	if err != nil {
+		app.errorJson(w, err)
+		return
+	}
+
+	log.Println(tokens.Token)
+
+}

@@ -14,6 +14,8 @@ func (app *application) routes() *chi.Mux {
 
 	mux.Get("/", app.Hello)
 
+	mux.Get("/authenticate", app.authenticate)
+
 	mux.Get("/movies", app.AllMovies)
 	return mux
 
